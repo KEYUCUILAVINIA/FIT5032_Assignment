@@ -55,14 +55,14 @@ namespace FIT5032_2021S2
             //   consumerSecret: "");
 
             //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            //   appId: "abc",
+            //   appSecret: "abc");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "684337781234-k7i0psco630k8dc403o089r5q4epnjtm.apps.googleusercontent.com",
+                ClientSecret = "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"
+            });
         }
     }
 }

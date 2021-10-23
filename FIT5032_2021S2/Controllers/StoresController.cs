@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using FIT5032_2021S2.Models;
+using Microsoft.AspNet.Identity;
 
 namespace FIT5032_2021S2.Controllers
 {
@@ -32,13 +33,27 @@ namespace FIT5032_2021S2.Controllers
             {
                 return HttpNotFound();
             }
+            store.Ratings = db.Ratings.Include("User").Where(r => r.StoreId == store.Id).ToList();
+            if (store.Ratings.Count != 0)
+            {
+                var total = 0;
+                foreach (var rate in store.Ratings)
+                {
+                    total += rate.Rate;
+                }
+                store.AvgRating = (decimal)total / store.Ratings.Count;
+            }
             return View(store);
         }
 
         // GET: Stores/Create
+        // Only log in users can create new store
+        // [Authorize(Roles = "Manager")]
         public ActionResult Create()
         {
-            return View();
+            if (User.IsInRole("Manager"))
+                return View();
+            return HttpNotFound();
         }
 
         // POST: Stores/Create
@@ -122,6 +137,30 @@ namespace FIT5032_2021S2.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public JsonResult GetStores()
+        {
+            var stores = db.Stores.ToList();
+            return new JsonResult { Data = stores, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult RateStore(int Id, string Comment, int Rate)
+        {
+            try
+            {
+                var userId = User.Identity.GetUserId();
+                var rate = new Rating { StoreId = Id, UserId = userId, Comment = Comment, Rate = Rate };
+                db.Ratings.Add(rate);
+                db.SaveChanges();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            return RedirectToAction($"Details/{Id}");
         }
     }
 }

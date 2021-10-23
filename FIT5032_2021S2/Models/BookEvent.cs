@@ -8,7 +8,7 @@ namespace FIT5032_2021S2.Models
 {
     public class BookEvent
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         [Required]
         public int StoreEventId { get; set; }
